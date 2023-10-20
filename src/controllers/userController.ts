@@ -4,11 +4,10 @@ import { User } from '../models/userModel'
 
 export const getAll = async (req: Request, res: Response) => {
     try {
-        let users = await User.findAll({
+        const users = await User.findAll({
             attributes: {
                 exclude: ['id']
-            },
-            limit: 20
+            }
         })
 
         res.status(200).json(users)
@@ -18,20 +17,42 @@ export const getAll = async (req: Request, res: Response) => {
     }
 }
 // Pesquisar pelo nome
-export const getUser = async (req: Request, res: Response) => {
+export const getUserByName = async (req: Request, res: Response) => {
     try {
         const nome = req.params.nome
-        const user = await User.findOne({
+        const user = await User.findAll({
             where: {
                 nome: {
                     [Op.like]: `%${nome}%`
                 }
             }
-
         })
         res.status(200).json(user)
 
     } catch (error) {
         res.json("Deu ruim: " + error)
+    }
+}
+// Pesquisar pelo ID
+export const getUserById = async (req: Request, res: Response) => {
+    try {
+        const { id } = req.params
+
+        const user = await User.findOne({
+            where: {
+                id: {
+                    [Op.eq]: id
+                }
+            }
+        })
+
+        if(!user){
+            return res.status(404).json("Usuário não encontrado!")
+        }
+        
+        return res.status(200).json(user) 
+    }
+    catch(error) {
+        res.status(400).json("Deu ruim: " + error)
     }
 }
