@@ -92,9 +92,30 @@ export const updateUser = async (req: Request, res: Response) => {
         await User.update(user, {
             where: { id }
         })
-    
         return res.status(201).send()
-    } catch (error) {
+    } 
+    catch (error) {
         res.json("Deu ruim: " + error)
     }
+}
+
+export const deleteUser = async (req: Request, res: Response) => {
+    const { id } = req.params
+
+    try {
+        const user = await User.findOne({
+            where: { id }
+        })
+    
+        if(user){
+            await user.destroy()
+            return res.status(200).json("Usuário deletado!")
+        }
+
+        return res.status(400).json("Usuário não encontrado")
+    } 
+    catch (error) {
+        res.json("Deu ruim: " + error)
+    }
+
 }
