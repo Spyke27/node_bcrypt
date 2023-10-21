@@ -82,3 +82,19 @@ export const createUser = async (req: Request, res: Response) => {
 
 }
 
+export const updateUser = async (req: Request, res: Response) => {
+    const { id } = req.params
+    const { nome, email, telefone, idade} = req.body
+
+    const user = { nome, email, telefone, idade }
+
+    try {
+        await User.update(user, {
+            where: { id }
+        })
+    
+        return res.status(201).send()
+    } catch (error) {
+        res.json("Deu ruim: " + error)
+    }
+}
