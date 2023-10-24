@@ -1,6 +1,7 @@
 import { Request, Response } from 'express'
 import { Op } from 'sequelize'
 import { User } from '../models/userModel'
+import { criptografarSenha } from '../auth/bcrypt'
 
 export const getAll = async (req: Request, res: Response) => {
     try {
@@ -59,9 +60,9 @@ export const getUserById = async (req: Request, res: Response) => {
 }
 
 export const createUser = async (req: Request, res: Response) => {
-    const { nome, email, telefone, idade } = req.body
+    const { nome, email, senha, telefone, idade } = req.body
 
-    if (!nome || !idade || !email || !telefone) {
+    if (!nome || !idade || !email || !senha || !telefone) {
         return res.status(400).json("Digite todos os dados!")
     }
 
@@ -69,6 +70,7 @@ export const createUser = async (req: Request, res: Response) => {
         const user = await User.create({
             nome,
             email,
+            senha: await criptografarSenha(senha),
             telefone,
             idade,
             cadastro: new Date()
@@ -117,5 +119,4 @@ export const deleteUser = async (req: Request, res: Response) => {
     catch (error) {
         res.json("Deu ruim: " + error)
     }
-
 }
