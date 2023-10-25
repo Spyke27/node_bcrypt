@@ -1,17 +1,23 @@
 import { Request, Response } from 'express'
-import { Op } from 'sequelize'
+import { Op, QueryTypes } from 'sequelize'
 import { User } from '../models/userModel'
 import { criptografarSenha } from '../auth/bcrypt'
+import { sequelize } from '../db/pg'
+import { Empresa } from '../models/empresaModel'
 
-export const getAll = async (req: Request, res: Response) => {
+export const listarUsuarios = async (req: Request, res: Response) => {
     try {
-        const users = await User.findAll({
+        const usuarios = await User.findAll({
             attributes: {
-                exclude: ['id']
-            }
+                exclude: ['id'],
+            },
+            include: [{
+                model: Empresa,
+                attributes: ['nome']
+            }]
         })
 
-        res.status(200).json(users)
+        return res.status(200).json(usuarios)
     }
     catch (error) {
         res.json("Deu ruim: " + error)
@@ -27,7 +33,11 @@ export const getUserByName = async (req: Request, res: Response) => {
                     [Op.iLike]: `%${nome}%`
                 }
             },
-            order: ['id']
+            order: ['id'],
+            include: [{
+                model: Empresa,
+                attributes: ['nome']
+            }]
         })
         res.status(200).json(user)
 
@@ -40,13 +50,7 @@ export const getUserById = async (req: Request, res: Response) => {
     try {
         const { id } = req.params
 
-        const user = await User.findOne({
-            where: {
-                id: {
-                    [Op.eq]: id
-                }
-            }
-        })
+        const user = await User.findByPk(id, {include: [{model: Empresa, attributes: ['nome']}]})
 
         if (!user) {
             return res.status(404).json("Usuário não encontrado!")
@@ -59,10 +63,10 @@ export const getUserById = async (req: Request, res: Response) => {
     }
 }
 
-export const createUser = async (req: Request, res: Response) => {
-    const { nome, email, senha, telefone, idade } = req.body
+export const cadastrarUsuario = async (req: Request, res: Response) => {
+    const { nome, email, senha, telefone, data_nasc, empresa_id } = req.body
 
-    if (!nome || !idade || !email || !senha || !telefone) {
+    if (!nome || !email || !senha || !telefone || !data_nasc) {
         return res.status(400).json("Digite todos os dados!")
     }
 
@@ -72,10 +76,9 @@ export const createUser = async (req: Request, res: Response) => {
             email,
             senha: await criptografarSenha(senha),
             telefone,
-            idade,
-            cadastro: new Date()
+            data_nasc,
+            empresa_id
         })
-
         return res.status(201).send()
 
     } catch (error) {
@@ -84,11 +87,11 @@ export const createUser = async (req: Request, res: Response) => {
 
 }
 
-export const updateUser = async (req: Request, res: Response) => {
+export const atualizarUsuario = async (req: Request, res: Response) => {
     const { id } = req.params
-    const { nome, email, telefone, idade} = req.body
+    const { nome, email, telefone, empresa_id } = req.body
 
-    const user = { nome, email, telefone, idade }
+    const user = { nome, email, telefone, empresa_id }
 
     try {
         await User.update(user, {
@@ -101,7 +104,7 @@ export const updateUser = async (req: Request, res: Response) => {
     }
 }
 
-export const deleteUser = async (req: Request, res: Response) => {
+export const deletarUsuario = async (req: Request, res: Response) => {
     const { id } = req.params
 
     try {
