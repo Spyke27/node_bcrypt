@@ -1,1 +1,1 @@
-# node_sequelize
+# Node com Sequelize & Bcrypt
