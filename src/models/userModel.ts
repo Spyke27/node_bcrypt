@@ -12,7 +12,6 @@ export interface UserInstance extends Model {
     empresa_id: number | null;
     data_nasc: Date | string
 }
-
 export const User = sequelize.define<UserInstance>("User", {
     id: {
         primaryKey: true,
