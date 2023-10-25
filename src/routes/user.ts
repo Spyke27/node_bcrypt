@@ -1,15 +1,16 @@
-import express, { Response, Request} from 'express';
-import { createUser, deleteUser, getAll, getUserById, getUserByName, updateUser } from '../controllers/userController';
+import express from 'express';
+import { cadastrarUsuario, deletarUsuario, listarUsuarios, getUserById, getUserByName, atualizarUsuario } 
+from '../controllers/userController';
 import { login } from '../auth/login';
 
-export const routes = express();
+export const userRoute = express();
 
-routes.get('/usuarios', getAll)
-routes.get('/usuarios/id/:id', getUserById)
-routes.get('/usuarios/nome/:nome', getUserByName)
+userRoute.get('/usuarios', listarUsuarios)
+userRoute.get('/usuarios/id/:id', getUserById)
+userRoute.get('/usuarios/nome/:nome', getUserByName)
 
-routes.post('/usuarios/cadastrar', createUser)
-routes.put('/usuarios/atualizar/:id', updateUser)
-routes.delete('/usuarios/deletar/:id', deleteUser)
+userRoute.post('/usuarios/cadastrar', cadastrarUsuario)
+userRoute.put('/usuarios/atualizar/:id', atualizarUsuario)
+userRoute.delete('/usuarios/deletar/:id', deletarUsuario)
 
-routes.post('/usuarios/login', login)
+userRoute.post('/usuarios/login', login)
