@@ -2,13 +2,19 @@ import { Request, Response } from 'express'
 import { Op } from 'sequelize'
 import { Empresa } from '../models/empresaModel'
 import { criptografarSenha } from '../auth/bcrypt'
+import { User } from '../models/userModel'
 
 export const listarEmpresas = async (req: Request, res: Response) => {
     try {
         const empresas = await Empresa.findAll({
             attributes: {
-                exclude: ['id']
-            }
+                exclude: ['id', 'senha']
+            },
+            include: [{
+                model: User,
+                attributes: ['nome']
+            }],
+            order: ['id']
         })
         return res.status(200).json(empresas)
 
