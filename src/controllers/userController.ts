@@ -9,8 +9,9 @@ export const listarUsuarios = async (req: Request, res: Response) => {
     try {
         const usuarios = await User.findAll({
             attributes: {
-                exclude: ['id'],
+                exclude: ['id', 'senha'],
             },
+            order: ['id'],
             include: [{
                 model: Empresa,
                 attributes: ['nome']
