@@ -1,5 +1,6 @@
 import { Model, DataTypes } from "sequelize";
 import { sequelize } from "../db/pg";
+import { Empresa } from '../models/empresaModel'
 
 export interface UserInstance extends Model {
     id: number;
@@ -7,8 +8,9 @@ export interface UserInstance extends Model {
     email: string;
     senha: string;
     telefone: string;
-    idade: number;
-    cadastro: Date | string
+    cadastro: Date | string;
+    empresa_id: number | null;
+    data_nasc: Date | string
 }
 
 export const User = sequelize.define<UserInstance>("User", {
@@ -21,7 +23,8 @@ export const User = sequelize.define<UserInstance>("User", {
         type: DataTypes.STRING
     },
     email: {
-        type: DataTypes.STRING
+        type: DataTypes.STRING,
+        unique: true
     },
     senha: {
         type: DataTypes.STRING
@@ -29,10 +32,13 @@ export const User = sequelize.define<UserInstance>("User", {
     telefone: {
         type: DataTypes.STRING
     },
-    idade: {
+    cadastro: {
+        type: DataTypes.DATE
+    },
+    empresa_id: {
         type: DataTypes.INTEGER
     },
-    cadastro: {
+    data_nasc: {
         type: DataTypes.DATE
     }
 },
@@ -41,3 +47,7 @@ export const User = sequelize.define<UserInstance>("User", {
     freezeTableName: false, 
     timestamps: false
 });
+User.belongsTo(Empresa, {
+    constraints: true,
+    foreignKey: 'empresa_id'
+})
