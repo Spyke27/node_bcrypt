@@ -50,3 +50,7 @@ User.belongsTo(Empresa, {
     constraints: true,
     foreignKey: 'empresa_id'
 })
+
+Empresa.hasMany(User, {
+    foreignKey: 'empresa_id',
+})
