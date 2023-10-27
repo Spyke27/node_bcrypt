@@ -14,6 +14,27 @@ export const listarEmpresas = async (req: Request, res: Response) => {
                 model: User,
                 attributes: ['nome']
             }],
+            order: ['nome']
+        })
+        return res.status(200).json(empresas)
+
+    } catch (error) {
+        res.json("Deu ruim: " + error)
+    }
+}
+
+export const getEmpresaByName = async (req: Request, res: Response) => {
+    try {
+        const { nome } = req.params
+        const empresas = await Empresa.findAll({
+            where: {
+                nome: {
+                    [Op.iLike]: `%${nome}%`
+                }
+            },
+            attributes: {
+                exclude: ['id', 'senha']
+            },
             order: ['id']
         })
         return res.status(200).json(empresas)
@@ -31,7 +52,7 @@ export const cadastrarEmpresa = async (req: Request, res: Response) => {
     }
 
     try {
-        const user = await Empresa.create({
+        const empresa = await Empresa.create({
             cnpj,
             nome,
             email,
@@ -43,5 +64,21 @@ export const cadastrarEmpresa = async (req: Request, res: Response) => {
     } catch (error) {
         res.json("Deu ruim: " + error)
     }
+}
 
+export const atualizarEmpresa = async (req: Request, res: Response) => {
+    const { id } = req.params
+    const { cnpj, nome, email, sobre  } = req.body
+
+    const empresa = { cnpj, nome, email, sobre }
+
+    try {
+        await Empresa.update(empresa, {
+            where: { id }
+        })
+        return res.status(200).send()
+
+    } catch (error) {
+        res.json("Deu ruim: " + error)
+    }
 }

@@ -1,7 +1,7 @@
 import { Model, DataTypes } from "sequelize";
 import { sequelize } from "../db/pg";
 
-export interface EmpresaInstance extends Model {
+export interface OngInstance extends Model {
     id: number;
     cnpj: string;
     nome: string;
@@ -11,7 +11,7 @@ export interface EmpresaInstance extends Model {
     sobre: string
 }
 
-export const Empresa = sequelize.define<EmpresaInstance>("Empresa", {
+export const Ong = sequelize.define<OngInstance>("Ong", {
     id: {
         primaryKey: true,
         autoIncrement: true,
@@ -38,7 +38,7 @@ export const Empresa = sequelize.define<EmpresaInstance>("Empresa", {
     }
 },
 {
-    tableName: "empresas",
+    tableName: "ongs",
     freezeTableName: false, 
     timestamps: false
 });

@@ -4,6 +4,8 @@ import { User } from '../models/userModel'
 import { criptografarSenha } from '../auth/bcrypt'
 import { sequelize } from '../db/pg'
 import { Empresa } from '../models/empresaModel'
+import JWT, { JwtPayload } from 'jsonwebtoken'
+import { jwtDecode } from "jwt-decode";
 
 export const listarUsuarios = async (req: Request, res: Response) => {
     try {
@@ -28,19 +30,19 @@ export const listarUsuarios = async (req: Request, res: Response) => {
 export const getUserByName = async (req: Request, res: Response) => {
     try {
         const nome = req.params.nome
-        const user = await User.findAll({
+        const users = await User.findAll({
             where: {
                 nome: {
                     [Op.iLike]: `%${nome}%`
                 }
             },
-            order: ['id'],
+            order: ['nome'],
             include: [{
                 model: Empresa,
                 attributes: ['nome']
             }]
         })
-        res.status(200).json(user)
+        res.status(200).json(users)
 
     } catch (error) {
         res.json("Deu ruim: " + error)
@@ -106,9 +108,8 @@ export const atualizarUsuario = async (req: Request, res: Response) => {
 }
 
 export const deletarUsuario = async (req: Request, res: Response) => {
-    const { id } = req.params
-
     try {
+        const id = req.user
         const user = await User.findOne({
             where: { id }
         })
@@ -116,11 +117,18 @@ export const deletarUsuario = async (req: Request, res: Response) => {
         if(user){
             await user.destroy()
             return res.status(200).json("Usuário deletado!")
+        } else {
+            return res.status(400).send()
         }
-
-        return res.status(400).json("Usuário não encontrado")
     } 
     catch (error) {
         res.json("Deu ruim: " + error)
     }
+}
+
+export const perfil = async (req: Request, res: Response) => {
+    const id = req.user
+    const user = await User.findOne({where: { id } })
+
+    return res.status(200).json(user)
 }
