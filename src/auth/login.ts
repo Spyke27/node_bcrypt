@@ -1,33 +1,22 @@
 import { verificarSenha } from './bcrypt'
 import { Request, Response } from 'express'
 import { User } from '../models/userModel'
-import jwt from 'jsonwebtoken'
+import JWT from 'jsonwebtoken'
 import dotenv from 'dotenv'
 
 export const login = async (req: Request, res: Response) => {
     const { email, senha } = req.body
+    dotenv.config()
 
     try {
         const user = await User.findOne({where: { email }})
-
         if(user){
             const autorizado = await verificarSenha(senha, user.senha)
-
+            
             if(autorizado){
-                const token = jwt.sign({id: user.id}, process.env.PASSWORD_TOKEN as string, {expiresIn: '24h'})
-
-                const usuario = {
-                    id: user.id,
-                    nome: user.nome,
-                    email: user.email,
-                    telefone: user.telefone,
-                    cadastro: user.cadastro,
-                    empresa_id: user.empresa_id,
-                    data_nasc: user.data_nasc
-                }
-
-                return res.status(200).json(usuario);
-            } 
+                const token = JWT.sign({id: user.id}, process.env.JWT_KEY as string, {expiresIn: '24h'})
+                return res.json(token);
+            }
             else {
                 return res.status(401).json(`Senha incorreta!`)
             }
@@ -35,8 +24,8 @@ export const login = async (req: Request, res: Response) => {
         else {
             return res.status(404).json("Usuário não encontrado!")
         }
-
-    } catch (error) {
+    } 
+    catch (error) {
         res.json("Deu ruim: " + error)
     }
 }
